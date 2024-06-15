@@ -1,36 +1,55 @@
 package org.clicksend.internal.operation;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
-import java.net.HttpURLConnection;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.Base64;
+import java.util.concurrent.TimeoutException;
 
-import org.clicksend.internal.ClickSendMule4sConnection;
+import javax.inject.Inject;
+
+import org.clicksend.internal.ClickSendAuthentication;
+import org.clicksend.internal.ClickSendConnection;
+import org.clicksend.internal.ClickSendMmsException;
+import org.clicksend.internal.ClickSendSmsException;
+import org.clicksend.internal.HttpResponseAttributes;
 import org.clicksend.internal.MMSMediaParameters;
 import org.clicksend.internal.MMSParameters;
 import org.clicksend.internal.SMSParameters;
-import org.clicksend.internal.config.ClickSendMule4sConfiguration;
+import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
 import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.domain.entity.HttpEntity;
+import org.mule.runtime.http.api.domain.entity.InputStreamHttpEntity;
+import org.mule.runtime.http.api.domain.message.request.HttpRequest;
+import org.mule.runtime.http.api.domain.message.response.HttpResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class ClickSendMule4sOperations {
 
+	@SuppressWarnings("deprecation")
+	@Inject
+    private MuleContext muleContext;
+	
 	private static final String APPLICATION_JSON_UTF_8 = "application/json; utf-8";
 	private static final String AUTHORIZATION = "Authorization";
 	private static final String CONTENT_TYPE = "Content-Type";
@@ -39,27 +58,43 @@ public class ClickSendMule4sOperations {
 	private static final String ACCEPT = "Accept";
 	private static final String UTF_8 = "utf-8";
 	private static final String BASIC = "Basic ";
+	private static final String OK = "OK";
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClickSendMule4sOperations.class);
-
+	
+	private final HttpService httpService;
+	private HttpClient httpClient;
+	
+	
+	public ClickSendMule4sOperations(HttpService httpService, HttpClient httpClient) {
+        this.httpService = httpService;
+        this.httpClient = httpClient;
+    }
+	
+	/**
+	 * Sends SMS
+	 * @param configuration
+	 * @param connection
+	 * @param smsParams
+	 * @return
+	 * @throws IOException
+	 * @throws ClickSendSmsException 
+	 * @throws TimeoutException 
+	 */
 	@MediaType(value = MediaType.APPLICATION_JSON, strict = false)
 	@Alias("SendSMS")
 	@DisplayName("Send SMS")
 	@Summary("Send SMS to a number")
-	public String sendSMS(@Config ClickSendMule4sConfiguration configuration,
-			@Connection ClickSendMule4sConnection connection,
-			@ParameterGroup(name = "SMS Parameters") SMSParameters smsParams) throws IOException {
+	@OutputJsonType(schema = "sms.json")
+	public Result<String, HttpResponseAttributes> sendSMS(@Config ClickSendConnectionProvider configuration,
+			@Connection ClickSendConnection connection,
+			@ParameterGroup(name = "SMS Parameters") SMSParameters smsParams) throws IOException, ClickSendSmsException, TimeoutException {
 
+		ClickSendConnectionProvider connectionProvider = new ClickSendConnectionProvider();
+		connectionProvider.start();
 		String username = configuration.getUserId();
 		String password = configuration.getPassword();
 
 		String auth = BASIC + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-		HttpURLConnection conn = connection.GetConnection("/sms/send");
-		conn.setRequestMethod("POST");
-		conn.setRequestProperty(CONTENT_TYPE, APPLICATION_JSON_UTF_8);
-		conn.setRequestProperty(ACCEPT, APPLICATION_JSON);
-		conn.setRequestProperty(AUTHORIZATION, auth);
-		conn.setDoOutput(true);
-
 		JSONObject root = null;
 		try {
 			root = new JSONObject();
@@ -79,39 +114,53 @@ public class ClickSendMule4sOperations {
 			LOGGER.error(ERROR_WHILE_PREPARING_REQUEST_PAYLOAD);
 			e.printStackTrace();
 		}
-
-		try (OutputStream os = conn.getOutputStream()) {
-			byte[] input = root.toString().getBytes(UTF_8);
-			os.write(input, 0, input.length);
-		} catch (Exception e) {
-			LOGGER.error("Error While Writing Request Payload to Connection:");
-			e.printStackTrace();
-			throw e;
-		}
-
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), UTF_8))) {
+		HttpEntity input = new InputStreamHttpEntity(new ByteArrayInputStream(root.toString().getBytes())); 
+		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send", input);
+		HttpResponse os = httpClient.send(conn, 50000, false, new ClickSendAuthentication(username,password));
+		connectionProvider.stop();
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {
 			StringBuilder response = new StringBuilder();
+			HttpResponseAttributes attributes = new HttpResponseAttributes();
 			String responseLine = null;
 			while ((responseLine = br.readLine()) != null) {
 				response.append(responseLine.trim());
 			}
-
-			return response.toString();
+			attributes.setStatusCode(200);
+			attributes.setMessage(OK);
+			return Result.<String, HttpResponseAttributes>builder() 
+			        .output(response.toString()) 
+			        .attributes(attributes) 
+			        .build();
 		} catch (Exception e) {
 			LOGGER.error("Error While Reading Response Payload.");
 			e.printStackTrace();
-			throw e;
+			throw new ClickSendSmsException(e.getMessage());
 		}
 	}
 
+	/**
+	 * Sends MMS
+	 * @param configuration
+	 * @param connection
+	 * @param mmsParams
+	 * @param mmsMediaParams
+	 * @return
+	 * @throws IllegalArgumentException
+	 * @throws UnsupportedEncodingException
+	 * @throws JSONException
+	 * @throws IOException
+	 * @throws ClickSendMmsException
+	 * @throws TimeoutException 
+	 */
 	@MediaType(value = MediaType.APPLICATION_JSON, strict = false)
 	@Alias("SendMMS")
 	@DisplayName("Send MMS")
 	@Summary("Send MMS to a number")
-	public String sendMMS(@Config ClickSendMule4sConfiguration configuration,
-			@Connection ClickSendMule4sConnection connection,
+	@OutputJsonType(schema = "mms.json")
+	public Result<String, HttpResponseAttributes> sendMMS(@Config ClickSendConnectionProvider configuration,
+			@Connection ClickSendConnection connection,
 			@ParameterGroup(name = "MMS Parameters") MMSParameters mmsParams,
-			@ParameterGroup(name = "MMS Media Parameters") MMSMediaParameters mmsMediaParams) throws IllegalArgumentException, UnsupportedEncodingException, JSONException, IOException {
+			@ParameterGroup(name = "MMS Media Parameters") MMSMediaParameters mmsMediaParams) throws IllegalArgumentException, UnsupportedEncodingException, JSONException, IOException, ClickSendMmsException, TimeoutException {
 		String username = configuration.getUserId();
 		String password = configuration.getPassword();
 
@@ -129,12 +178,6 @@ public class ClickSendMule4sOperations {
 		}
 
 		String auth = BASIC + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-		HttpURLConnection conn = connection.GetConnection("/mms/send");
-		conn.setRequestMethod("POST");
-		conn.setRequestProperty(CONTENT_TYPE, APPLICATION_JSON_UTF_8);
-		conn.setRequestProperty(ACCEPT, APPLICATION_JSON);
-		conn.setRequestProperty(AUTHORIZATION, auth);
-		conn.setDoOutput(true);
 
 		JSONObject root = null;
 		try {
@@ -164,32 +207,32 @@ public class ClickSendMule4sOperations {
 			e.printStackTrace();
 			throw e;
 		}
-
-		try (OutputStream os = conn.getOutputStream()) {
-			byte[] input = root.toString().getBytes(UTF_8);
-			os.write(input, 0, input.length);
-		} catch (Exception e) {
-			LOGGER.error("Error While Writing Request Payload to Connection.");
-			e.printStackTrace();
-			throw e;
-		}
-
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), UTF_8))) {
+		HttpEntity input = new InputStreamHttpEntity(new ByteArrayInputStream(root.toString().getBytes())); 
+		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send", input);
+		
+		HttpResponse os = httpClient.send(conn, 50000, false, new ClickSendAuthentication(username,password));
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {
 			StringBuilder response = new StringBuilder();
+			HttpResponseAttributes attributes = new HttpResponseAttributes();
 			String responseLine = null;
 			while ((responseLine = br.readLine()) != null) {
 				response.append(responseLine.trim());
 			}
-			return response.toString();
+			attributes.setStatusCode(200);
+			attributes.setMessage(OK);
+			return Result.<String, HttpResponseAttributes>builder() 
+			        .output(response.toString()) 
+			        .attributes(attributes) 
+			        .build();
 		} catch (FileNotFoundException e) {
 			LOGGER.error("Error While Reading Payload From Response.");
 			e.printStackTrace();
-			throw e;
+			throw new ClickSendMmsException(e.getMessage());
 		}
 	}
 
-	private String UploadFile(ClickSendMule4sConnection connection, String filePath, String username, String password)
-			throws UnsupportedEncodingException, IOException, JSONException {
+	private String UploadFile(ClickSendConnection connection, String filePath, String username, String password)
+			throws UnsupportedEncodingException, IOException, JSONException, TimeoutException {
 		byte[] bytes;
 		try {
 			bytes = Files.readAllBytes(Paths.get(filePath));
@@ -202,13 +245,8 @@ public class ClickSendMule4sOperations {
 		byte[] encoded = Base64.getEncoder().encode(bytes);
 
 		String auth = BASIC + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
-		HttpURLConnection conn = connection.GetConnection("/uploads?convert=mms");
-		conn.setRequestMethod("POST");
-		conn.setRequestProperty(CONTENT_TYPE, APPLICATION_JSON_UTF_8);
-		conn.setRequestProperty(ACCEPT, APPLICATION_JSON);
-		conn.setRequestProperty(AUTHORIZATION, auth);
-		conn.setDoOutput(true);
-
+		
+		
 		JSONObject root = null;
 		try {
 			root = new JSONObject();
@@ -219,16 +257,13 @@ public class ClickSendMule4sOperations {
 			throw e;
 		}
 
-		try (OutputStream os = conn.getOutputStream()) {
-			byte[] input = root.toString().getBytes(UTF_8);
-			os.write(input, 0, input.length);
-		} catch (Exception e) {
-			LOGGER.error("Error While Writing Request Payload to Connection.");
-			e.printStackTrace();
-			return null;
-		}
+		HttpEntity input = new InputStreamHttpEntity(new ByteArrayInputStream(root.toString().getBytes())); 
+		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send",input);
+		ClickSendAuthentication clickSendAuthentication = new ClickSendAuthentication(username,password);
+		clickSendAuthentication.authenticate(HttpRequest.builder());
+		HttpResponse os = httpClient.send(conn, 50000, false, clickSendAuthentication);
 
-		try (BufferedReader br = new BufferedReader(new InputStreamReader(conn.getInputStream(), UTF_8))) {
+		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {
 			StringBuilder response = new StringBuilder();
 			String responseLine = null;
 			while ((responseLine = br.readLine()) != null) {

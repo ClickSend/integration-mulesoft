@@ -1,0 +1,40 @@
+{
+    "http_code": 200,
+    "response_code": "SUCCESS",
+    "response_msg": "Messages queued for delivery.",
+    "data": {
+        "total_price": 0,
+        "total_count": 1,
+        "queued_count": 1,
+        "messages": [
+            {
+                "direction": "out",
+                "date": 1718099544,
+                "to": "+61411111111",
+                "body": "test message, please ignore",
+                "from": "+61411111111",
+                "schedule": 1718099544,
+                "message_id": "1EF27D84-DFCE-6336-8896-9F4EDDAD2DDB",
+                "message_parts": 0,
+                "message_price": "0.0000",
+                "from_email": null,
+                "list_id": null,
+                "custom_string": "",
+                "contact_id": null,
+                "user_id": 304497,
+                "subaccount_id": 345789,
+                "is_shared_system_number": false,
+                "country": "AU",
+                "carrier": "Optus",
+                "status": "SUCCESS"
+            }
+        ],
+        "_currency": {
+            "currency_name_short": "AUD",
+            "currency_prefix_d": "$",
+            "currency_prefix_c": "c",
+            "currency_name_long": "Australian Dollars"
+        },
+        "blocked_count": 0
+    }
+}

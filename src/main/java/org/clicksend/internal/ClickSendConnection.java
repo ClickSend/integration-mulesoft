@@ -12,11 +12,11 @@ import org.slf4j.LoggerFactory;
 /**
  * This class represents an extension connection just as example (there is no real connection with anything here c:).
  */
-public final class ClickSendMule4sConnection {
+public final class ClickSendConnection {
 
   private final String BASE_URL = "https://rest.clicksend.com/v3";
   private HttpURLConnection connection = null;
-  private static final Logger LOGGER = LoggerFactory.getLogger(ClickSendMule4sConnection.class);
+  private static final Logger LOGGER = LoggerFactory.getLogger(ClickSendConnection.class);
   
 
   public HttpURLConnection GetConnection(String endpoint) {
@@ -28,11 +28,17 @@ public final class ClickSendMule4sConnection {
 		  return connection;
 	  } catch (MalformedURLException e) {
 		  // TODO Auto-generated catch block
+		  if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("Invalid URL %s",uri);
+			}
 		  LOGGER.error(String.format("Invalid URL %s",uri));
 		  e.printStackTrace();
 		  return null;
 	  } catch (IOException e) {
 		  // TODO Auto-generated catch block
+		  if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("IO Exception, unable to open connection to %s", uri);
+			}
 		  LOGGER.error(String.format("IO Exception, unable to open connection to %s", uri));
 		  e.printStackTrace();
 		  return null;

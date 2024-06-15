@@ -1,0 +1,34 @@
+{
+    "http_code": 200,
+    "response_code": "SUCCESS",
+    "response_msg": "Messages queued for delivery.",
+    "data": {
+        "total_price": 0,
+        "total_count": 1,
+        "queued_count": 1,
+        "messages": [
+            {
+                "message_id": "FC9EA26C-6FE3-4F47-AF5A-47EBDF96EDBC",
+                "to": "+61411111111",
+                "subject": "Test MMS",
+                "from": "+61411111111",
+                "body": "Image attached",
+                "country": "AU",
+                "custom_string": "",
+                "schedule": 1512538536,
+                "message_parts": 0,
+                "message_price": "0.0000",
+                "_media_file_url": "https://clicksend-api-downloads.s3.ap-southeast-2.amazonaws.com/_private/089D0230-B5C3-4C2F-A49B-795FA2CCF3BC.jpg?X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Credential=AKIAWKMIV4OKATYVXFML%2F20240611%2Fap-southeast-2%2Fs3%2Faws4_request&X-Amz-Date=20240611T095340Z&X-Amz-SignedHeaders=host&X-Amz-Expires=1800&X-Amz-Signature=ea95c805293f7ac2173d1a1053344a96f03d1e8913fb4fc8a7b1acb92c371b12",
+                "status": "SUCCESS"
+            }
+        ],
+        "_currency": {
+            "currency_name_short": "AUD",
+            "currency_prefix_d": "$",
+            "currency_prefix_c": "c",
+            "currency_name_long": "Australian Dollars",
+            "min_recharge_amount": "20.00",
+            "max_recharge_amount": "10000.00"
+        }
+    }
+}

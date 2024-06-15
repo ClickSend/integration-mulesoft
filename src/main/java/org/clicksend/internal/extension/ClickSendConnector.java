@@ -2,7 +2,7 @@ package org.clicksend.internal.extension;
 
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.Sources;
-import org.clicksend.internal.config.ClickSendMule4sConfiguration;
+import org.clicksend.internal.config.ClickSendConfiguration;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
@@ -14,7 +14,7 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
  */
 @Xml(prefix = "clicksend")
 @Extension(name = "ClickSend", category = Category.CERTIFIED)
-@Configurations(ClickSendMule4sConfiguration.class)
-public class ClickSendMule4sExtensionConnector {
+@Configurations(ClickSendConfiguration.class)
+public class ClickSendConnector {
 
 }

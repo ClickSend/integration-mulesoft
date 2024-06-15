@@ -13,7 +13,7 @@ public class ConnectionTest {
 	@Test
     public void connectionTest()
     {
-		ClickSendMule4sConnection a = new ClickSendMule4sConnection();
+		ClickSendConnection a = new ClickSendConnection();
 		HttpURLConnection r = a.GetConnection("/sms/send");
 		System.out.println(r.toString());  
 		Assert.assertNotNull(r);
@@ -23,7 +23,7 @@ public class ConnectionTest {
 	@Test
     public void invalidateTest()
     {
-		ClickSendMule4sConnection a = new ClickSendMule4sConnection();
+		ClickSendConnection a = new ClickSendConnection();
 		HttpURLConnection r = a.GetConnection("/sms/send");
 		a.invalidate();
 		Assert.assertNotNull(r);

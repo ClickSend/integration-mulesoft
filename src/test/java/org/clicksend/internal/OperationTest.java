@@ -1,23 +1,27 @@
 package org.clicksend.internal;
 
 import java.io.IOException;
+import java.util.concurrent.TimeoutException;
 
-import org.clicksend.internal.config.ClickSendMule4sConfiguration;
+import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
 import org.clicksend.internal.operation.ClickSendMule4sOperations;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.http.api.client.HttpClient;
+import org.mule.runtime.http.api.HttpService;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class OperationTest {
 
 	@Test
-    public void smsTest() throws IOException
+    public void smsTest() throws IOException, ClickSendSmsException, TimeoutException
     {
-		ClickSendMule4sOperations op = new ClickSendMule4sOperations();
-		ClickSendMule4sConfiguration configuration = new ClickSendMule4sConfiguration();
-		ClickSendMule4sConnection connection = new ClickSendMule4sConnection();
+		ClickSendMule4sOperations op = new ClickSendMule4sOperations(null, null);
+		ClickSendConnectionProvider configuration = new ClickSendConnectionProvider();
+		ClickSendConnection connection = new ClickSendConnection();
 		SMSParameters smsParams = new SMSParameters();
 		
 		configuration.setUserId("clicksendtest@gmail.com");
@@ -28,7 +32,7 @@ public class OperationTest {
 		smsParams.setMessage("test message, please ignore");
 		smsParams.setCustomString("test message, please ignore");
 		
-		String r = op.sendSMS(configuration, connection, smsParams);
+		Result<String, HttpResponseAttributes> r = op.sendSMS(configuration, connection, smsParams);
 		System.out.println(r.toString());  
 		Assert.assertNotNull(r);
     }
@@ -36,9 +40,9 @@ public class OperationTest {
 	@Test
     public void mmsWithFilePathTest() throws Exception
     {
-		ClickSendMule4sOperations op = new ClickSendMule4sOperations();
-		ClickSendMule4sConfiguration configuration = new ClickSendMule4sConfiguration();
-		ClickSendMule4sConnection connection = new ClickSendMule4sConnection();
+		ClickSendMule4sOperations op = new ClickSendMule4sOperations(null, null);
+		ClickSendConnectionProvider configuration = new ClickSendConnectionProvider();
+		ClickSendConnection connection = new ClickSendConnection();
 		MMSParameters mmsParams = new MMSParameters();
 		MMSMediaParameters mmsMediaParams = new MMSMediaParameters();
 		
@@ -52,7 +56,7 @@ public class OperationTest {
 		mmsParams.setSubject("test message");
 		mmsMediaParams.setFilePath("src/test/resources/Mercedes.jpg");
 		
-		String r = op.sendMMS(configuration, connection, mmsParams, mmsMediaParams);
+		Result<String, HttpResponseAttributes> r = op.sendMMS(configuration, connection, mmsParams, mmsMediaParams);
 		System.out.println(r.toString());  
 		Assert.assertNotNull(r);
 		
@@ -61,9 +65,9 @@ public class OperationTest {
 	@Test
     public void mmsWithoutFilePathTest() 
     {
-		ClickSendMule4sOperations op = new ClickSendMule4sOperations();
-		ClickSendMule4sConfiguration configuration = new ClickSendMule4sConfiguration();
-		ClickSendMule4sConnection connection = new ClickSendMule4sConnection();
+		ClickSendMule4sOperations op = new ClickSendMule4sOperations(null, null);
+		ClickSendConnectionProvider configuration = new ClickSendConnectionProvider();
+		ClickSendConnection connection = new ClickSendConnection();
 		MMSParameters mmsParams = new MMSParameters();
 		MMSMediaParameters mmsMediaParams = new MMSMediaParameters();
 		
@@ -77,7 +81,7 @@ public class OperationTest {
 		mmsParams.setSubject("test message");
 		mmsMediaParams.setFilePath("src/test/resources/Mercedes1.jpg");
 		
-		String r = null;
+		Result<String, HttpResponseAttributes> r = null;
 		try {
 			r = op.sendMMS(configuration, connection, mmsParams, mmsMediaParams);
 		} catch (Exception e) {
@@ -91,9 +95,9 @@ public class OperationTest {
 	@Test
     public void mmsWithoutFileURLTest() 
     {
-		ClickSendMule4sOperations op = new ClickSendMule4sOperations();
-		ClickSendMule4sConfiguration configuration = new ClickSendMule4sConfiguration();
-		ClickSendMule4sConnection connection = new ClickSendMule4sConnection();
+		ClickSendMule4sOperations op = new ClickSendMule4sOperations(null, null);
+		ClickSendConnectionProvider configuration = new ClickSendConnectionProvider();
+		ClickSendConnection connection = new ClickSendConnection();
 		MMSParameters mmsParams = new MMSParameters();
 		MMSMediaParameters mmsMediaParams = new MMSMediaParameters();
 		
@@ -107,7 +111,7 @@ public class OperationTest {
 		mmsParams.setSubject("test message");
 		mmsMediaParams.setFileURL(null);
 		
-		String r = null;
+		Result<String, HttpResponseAttributes> r = null;
 		try {
 			r = op.sendMMS(configuration, connection, mmsParams, mmsMediaParams);
 		} catch (Exception e) {

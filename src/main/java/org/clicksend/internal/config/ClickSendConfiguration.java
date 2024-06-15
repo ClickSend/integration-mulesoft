@@ -1,6 +1,7 @@
 package org.clicksend.internal.config;
 
-import org.clicksend.internal.connection.provider.ClickSendMule4sConnectionProvider;
+import org.apache.commons.lang3.JavaVersion;
+import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
 import org.clicksend.internal.operation.ClickSendMule4sOperations;
 import org.mule.runtime.extension.api.annotation.Operations;
 import org.mule.runtime.extension.api.annotation.connectivity.ConnectionProviders;
@@ -16,36 +17,7 @@ import org.springframework.core.annotation.Order;
  * operations since they represent something core from the extension.
  */
 @Operations(ClickSendMule4sOperations.class)
-@ConnectionProviders(ClickSendMule4sConnectionProvider.class)
-public class ClickSendMule4sConfiguration {
+@ConnectionProviders(ClickSendConnectionProvider.class)
+public class ClickSendConfiguration {
 
-  @Parameter
-  @Placement(tab = "DEFAULT_TAB")
-  @DisplayName(value = "Username/Email")
-  @Order(value = 1)
-  @Example(value = "abc@xyz.com")
-  private String userId;
-  
-  @Parameter
-  @Placement(tab = "DEFAULT_TAB")
-  @DisplayName(value = "Password")
-  @Order(value = 2)
-  @Password
-  private String password;
-
-  public String getUserId(){
-    return userId;
-  }
-  
-  public String getPassword(){
-	    return password;
-	  }
-
-public void setUserId(String userId) {
-	this.userId = userId;
-}
-
-public void setPassword(String password) {
-	this.password = password;
-}
 }
