@@ -1,5 +1,5 @@
-About MuleSoft Certified Connectors
+About ClickSend Certified Connectors
 
-MuleSoft Certified Connectors are developed by MuleSoft’s partners and developer community. These connectors have been reviewed and certified by MuleSoft. To purchase the ClickSend - Mule 4 Connector or to receive assistance or support for it, please contact ClickSend directly at info@clicksend.com. MuleSoft disclaims any support obligation for MuleSoft Certified Connectors.
+ClickSend Certified Connectors are developed by ClickSend's partners and developer community. These connectors have been reviewed and certified by ClickSend. To purchase the ClickSend Connector or to receive assistance or support for it, please contact us directly at support via chat or at https://www.clicksend.com/en/help
 
-By installing this connector, you consent to MuleSoft sharing your contact information with the developer of this connector so that you can receive more information about it directly from the developer.
+By installing this connector, you consent to ClickSend sharing your contact information with the developer of this connector so that you can receive more information about it directly from the developer.
