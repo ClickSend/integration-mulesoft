@@ -3,15 +3,15 @@ package org.clicksend.internal;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import org.clicksend.internal.connection.ClickSendConnection;
 import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
+import org.clicksend.internal.error.exception.ClickSendSmsException;
 import org.clicksend.internal.operation.ClickSendMule4sOperations;
 import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
 import org.mule.runtime.extension.api.runtime.operation.Result;
-import org.mule.runtime.http.api.client.HttpClient;
-import org.mule.runtime.http.api.HttpService;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class OperationTest {

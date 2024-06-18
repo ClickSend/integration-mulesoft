@@ -1,10 +1,12 @@
+/**
+ * The usage of this connector is governed by the terms in the LICENSE.md file.
+ */
 package org.clicksend.internal.extension;
 
-import org.mule.runtime.extension.api.annotation.Extension;
-import org.mule.runtime.extension.api.annotation.Sources;
 import org.clicksend.internal.config.ClickSendConfiguration;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.extension.api.annotation.Configurations;
+import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
 
 

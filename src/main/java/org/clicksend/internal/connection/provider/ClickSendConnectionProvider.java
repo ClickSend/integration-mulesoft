@@ -1,19 +1,20 @@
+/**
+ * The usage of this connector is governed by the terms in the LICENSE.md file.
+ */
 package org.clicksend.internal.connection.provider;
 
 import java.net.ProtocolException;
 
 import javax.inject.Inject;
 
-import org.clicksend.internal.ClickSendConnection;
+import org.clicksend.internal.connection.ClickSendConnection;
 import org.mule.runtime.api.connection.CachedConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionException;
 import org.mule.runtime.api.connection.ConnectionProvider;
 import org.mule.runtime.api.connection.ConnectionValidationResult;
 import org.mule.runtime.api.connection.PoolingConnectionProvider;
-import org.mule.runtime.api.exception.MuleException;
 import org.mule.runtime.api.lifecycle.Startable;
 import org.mule.runtime.api.lifecycle.Stoppable;
-import org.mule.runtime.api.scheduler.SchedulerService;
 import org.mule.runtime.extension.api.annotation.param.Optional;
 import org.mule.runtime.extension.api.annotation.param.Parameter;
 import org.mule.runtime.extension.api.annotation.param.RefName;
@@ -58,6 +59,10 @@ public class ClickSendConnectionProvider implements CachedConnectionProvider<Cli
 	private static final String BASE_URL = "https://rest.clicksend.com/v3";
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClickSendConnectionProvider.class);
 
+
+	@RefName
+	private String configName;
+
 	@Parameter
 	@Placement(tab = "DEFAULT_TAB")
 	@DisplayName(value = "Username/Email")
@@ -75,9 +80,6 @@ public class ClickSendConnectionProvider implements CachedConnectionProvider<Cli
 	@Inject
 	private HttpService httpService;
 	private HttpClient httpClient;
-
-	@RefName
-	private String configName;
 
 	@Parameter
 	@Optional

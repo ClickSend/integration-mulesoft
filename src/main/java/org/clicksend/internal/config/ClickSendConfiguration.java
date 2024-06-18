@@ -1,3 +1,6 @@
+/**
+ * The usage of this connector is governed by the terms in the LICENSE.md file.
+ */
 package org.clicksend.internal.config;
 
 import org.apache.commons.lang3.JavaVersion;

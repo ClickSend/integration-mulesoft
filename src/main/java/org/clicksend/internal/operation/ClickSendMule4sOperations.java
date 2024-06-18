@@ -1,3 +1,6 @@
+/**
+ * The usage of this connector is governed by the terms in the LICENSE.md file.
+ */
 package org.clicksend.internal.operation;
 
 import java.io.BufferedReader;
@@ -14,19 +17,21 @@ import java.util.concurrent.TimeoutException;
 import javax.inject.Inject;
 
 import org.clicksend.internal.ClickSendAuthentication;
-import org.clicksend.internal.ClickSendConnection;
-import org.clicksend.internal.ClickSendMmsException;
-import org.clicksend.internal.ClickSendSmsException;
 import org.clicksend.internal.HttpResponseAttributes;
 import org.clicksend.internal.MMSMediaParameters;
 import org.clicksend.internal.MMSParameters;
 import org.clicksend.internal.SMSParameters;
+import org.clicksend.internal.connection.ClickSendConnection;
 import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
+import org.clicksend.internal.error.exception.ClickSendMmsException;
+import org.clicksend.internal.error.exception.ClickSendSmsException;
+import org.clicksend.internal.error.provider.MessageErrorTypeProvider;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.mule.runtime.core.api.MuleContext;
 import org.mule.runtime.extension.api.annotation.Alias;
+import org.mule.runtime.extension.api.annotation.error.Throws;
 import org.mule.runtime.extension.api.annotation.metadata.fixed.OutputJsonType;
 import org.mule.runtime.extension.api.annotation.param.Config;
 import org.mule.runtime.extension.api.annotation.param.Connection;
@@ -85,6 +90,7 @@ public class ClickSendMule4sOperations {
 	@DisplayName("Send SMS")
 	@Summary("Send SMS to a number")
 	@OutputJsonType(schema = "sms.json")
+	@Throws(MessageErrorTypeProvider.class)
 	public Result<String, HttpResponseAttributes> sendSMS(@Config ClickSendConnectionProvider configuration,
 			@Connection ClickSendConnection connection,
 			@ParameterGroup(name = "SMS Parameters") SMSParameters smsParams) throws IOException, ClickSendSmsException, TimeoutException {
@@ -116,7 +122,7 @@ public class ClickSendMule4sOperations {
 		}
 		HttpEntity input = new InputStreamHttpEntity(new ByteArrayInputStream(root.toString().getBytes())); 
 		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send", input);
-		HttpResponse os = httpClient.send(conn, 50000, false, new ClickSendAuthentication(username,password));
+		HttpResponse os = httpClient.send(conn, connection.getTimeoutAsMilliseconds(), false, new ClickSendAuthentication(username,password));
 		connectionProvider.stop();
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {
 			StringBuilder response = new StringBuilder();
@@ -157,6 +163,7 @@ public class ClickSendMule4sOperations {
 	@DisplayName("Send MMS")
 	@Summary("Send MMS to a number")
 	@OutputJsonType(schema = "mms.json")
+	@Throws(MessageErrorTypeProvider.class)
 	public Result<String, HttpResponseAttributes> sendMMS(@Config ClickSendConnectionProvider configuration,
 			@Connection ClickSendConnection connection,
 			@ParameterGroup(name = "MMS Parameters") MMSParameters mmsParams,
@@ -210,7 +217,7 @@ public class ClickSendMule4sOperations {
 		HttpEntity input = new InputStreamHttpEntity(new ByteArrayInputStream(root.toString().getBytes())); 
 		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send", input);
 		
-		HttpResponse os = httpClient.send(conn, 50000, false, new ClickSendAuthentication(username,password));
+		HttpResponse os = httpClient.send(conn, connection.getTimeoutAsMilliseconds(), false, new ClickSendAuthentication(username,password));
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {
 			StringBuilder response = new StringBuilder();
 			HttpResponseAttributes attributes = new HttpResponseAttributes();
@@ -261,7 +268,7 @@ public class ClickSendMule4sOperations {
 		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send",input);
 		ClickSendAuthentication clickSendAuthentication = new ClickSendAuthentication(username,password);
 		clickSendAuthentication.authenticate(HttpRequest.builder());
-		HttpResponse os = httpClient.send(conn, 50000, false, clickSendAuthentication);
+		HttpResponse os = httpClient.send(conn, connection.getTimeoutAsMilliseconds(), false, clickSendAuthentication);
 
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {
 			StringBuilder response = new StringBuilder();

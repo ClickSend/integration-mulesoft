@@ -1,5 +1,6 @@
 package org.clicksend.internal;
 
+import org.clicksend.internal.connection.ClickSendConnection;
 import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
 import org.junit.Assert;
 import org.junit.Test;

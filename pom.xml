@@ -31,35 +31,12 @@
 			<artifactId>mule-http-connector</artifactId>
 			<version>1.9.2</version>
 		</dependency>
-		<dependency>
-			<groupId>org.mule.runtime</groupId>
-			<artifactId>mule-http-connector</artifactId>
-			<version>1.5.0</version>
-		</dependency>
-
 	</dependencies>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>mulesoft-releases</id>
-			<name>mulesoft release repository</name>
-			<layout>default</layout>
-			<url>https://repository.mulesoft.org/releases/</url>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</pluginRepository>
-	</pluginRepositories>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>org.mule</groupId>
-				<artifactId>mule-javaee-runtime-bom</artifactId>
-				<version>${muleJavaEeBomVersion}</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
+	<repositories>
+		<repository>
+			<id>mule-releases</id>
+			<name>Nexus Public Releases</name>
+			<url>https://repository-master.mulesoft.org/nexus/content/repositories/releases/</url>
+		</repository>
+	</repositories>
 </project>

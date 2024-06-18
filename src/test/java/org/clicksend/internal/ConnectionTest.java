@@ -1,12 +1,10 @@
 package org.clicksend.internal;
 
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 
+import org.clicksend.internal.connection.ClickSendConnection;
 import org.junit.Assert;
 import org.junit.Test;
-import org.mule.functional.junit4.FunctionalTestCase;
 
 public class ConnectionTest {
 
