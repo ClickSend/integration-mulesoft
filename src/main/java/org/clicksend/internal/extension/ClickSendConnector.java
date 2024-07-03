@@ -4,10 +4,12 @@
 package org.clicksend.internal.extension;
 
 import org.clicksend.internal.config.ClickSendConfiguration;
+import org.clicksend.internal.error.MessageErrorType;
 import org.mule.runtime.api.meta.Category;
 import org.mule.runtime.extension.api.annotation.Configurations;
 import org.mule.runtime.extension.api.annotation.Extension;
 import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
+import org.mule.runtime.extension.api.annotation.error.ErrorTypes;
 
 
 /**
@@ -15,7 +17,8 @@ import org.mule.runtime.extension.api.annotation.dsl.xml.Xml;
  * and sources are going to be declared.
  */
 @Xml(prefix = "clicksend")
-@Extension(name = "ClickSend", category = Category.CERTIFIED)
+@Extension(name = "clicksend", category = Category.CERTIFIED)
+@ErrorTypes(MessageErrorType.class)
 @Configurations(ClickSendConfiguration.class)
 public class ClickSendConnector {
 

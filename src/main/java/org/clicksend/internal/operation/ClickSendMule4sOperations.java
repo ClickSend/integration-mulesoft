@@ -268,6 +268,7 @@ public class ClickSendMule4sOperations {
 		HttpRequest conn = ClickSendConnectionProvider.getConnection(connection, auth, "/mms/send",input);
 		ClickSendAuthentication clickSendAuthentication = new ClickSendAuthentication(username,password);
 		clickSendAuthentication.authenticate(HttpRequest.builder());
+		LOGGER.info("httpClient: ",httpClient);
 		HttpResponse os = httpClient.send(conn, connection.getTimeoutAsMilliseconds(), false, clickSendAuthentication);
 
 		try (BufferedReader br = new BufferedReader(new InputStreamReader(os.getEntity().getContent()))) {

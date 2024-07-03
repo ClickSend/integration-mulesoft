@@ -11,15 +11,25 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
+import org.mule.runtime.api.lifecycle.InitialisationException;
+import org.mule.runtime.core.api.MuleContext;
+import org.mule.runtime.core.api.config.ConfigurationException;
+import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
+import org.mule.runtime.http.api.HttpService;
+import org.mule.runtime.http.api.client.HttpClient;
 
 @RunWith(value = BlockJUnit4ClassRunner.class)
 public class OperationTest {
 
+    private HttpService httpService;
+    private HttpClient httpClient;
+
+	
 	@Test
     public void smsTest() throws IOException, ClickSendSmsException, TimeoutException
     {
-		ClickSendMule4sOperations op = new ClickSendMule4sOperations(null, null);
+		ClickSendMule4sOperations op = new ClickSendMule4sOperations(httpService, httpClient);
 		ClickSendConnectionProvider configuration = new ClickSendConnectionProvider();
 		ClickSendConnection connection = new ClickSendConnection();
 		SMSParameters smsParams = new SMSParameters();
@@ -40,7 +50,7 @@ public class OperationTest {
 	@Test
     public void mmsWithFilePathTest() throws Exception
     {
-		ClickSendMule4sOperations op = new ClickSendMule4sOperations(null, null);
+		ClickSendMule4sOperations op = new ClickSendMule4sOperations(httpService, httpClient);
 		ClickSendConnectionProvider configuration = new ClickSendConnectionProvider();
 		ClickSendConnection connection = new ClickSendConnection();
 		MMSParameters mmsParams = new MMSParameters();
