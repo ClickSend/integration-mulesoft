@@ -9,8 +9,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.concurrent.TimeUnit;
 
+import org.mule.runtime.extension.api.annotation.param.Parameter;
+import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
+import org.mule.runtime.extension.api.annotation.param.display.Example;
+import org.mule.runtime.extension.api.annotation.param.display.Placement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.core.annotation.Order;
 
 /**
  * This class represents an extension connection just as example (there is no
@@ -24,6 +29,11 @@ public final class ClickSendConnection {
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClickSendConnection.class);
 
 	private int timeout;
+	
+	@Parameter
+	@Placement(tab = "DEFAULT_TAB")
+	@DisplayName(value = "timeout")
+	@Example(value = "1000")
 	private TimeUnit timeoutUnit;
 
 	public HttpURLConnection GetConnection(String endpoint) {
