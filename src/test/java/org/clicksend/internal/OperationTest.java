@@ -3,6 +3,7 @@ package org.clicksend.internal;
 import java.io.IOException;
 import java.util.concurrent.TimeoutException;
 
+import org.clicksend.api.HttpResponseAttributes;
 import org.clicksend.internal.connection.ClickSendConnection;
 import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
 import org.clicksend.internal.error.exception.ClickSendSmsException;
@@ -11,10 +12,6 @@ import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.BlockJUnit4ClassRunner;
-import org.mule.runtime.api.lifecycle.InitialisationException;
-import org.mule.runtime.core.api.MuleContext;
-import org.mule.runtime.core.api.config.ConfigurationException;
-import org.mule.runtime.core.api.context.MuleContextFactory;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;

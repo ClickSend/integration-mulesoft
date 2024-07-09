@@ -18,6 +18,7 @@ import org.slf4j.LoggerFactory;
  */
 public final class ClickSendConnection {
 
+	
 	private final String BASE_URL = "https://rest.clicksend.com/v3";
 	private HttpURLConnection connection = null;
 	private static final Logger LOGGER = LoggerFactory.getLogger(ClickSendConnection.class);

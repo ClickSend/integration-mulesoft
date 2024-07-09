@@ -1,7 +1,7 @@
 /**
  * The usage of this connector is governed by the terms in the LICENSE.md file.
  */
-package org.clicksend.internal;
+package org.clicksend.api;
 
 public class HttpResponseAttributes {
 

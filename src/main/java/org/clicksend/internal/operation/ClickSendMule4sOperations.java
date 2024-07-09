@@ -16,11 +16,12 @@ import java.util.concurrent.TimeoutException;
 
 import javax.inject.Inject;
 
+import org.clicksend.api.HttpResponseAttributes;
 import org.clicksend.internal.ClickSendAuthentication;
-import org.clicksend.internal.HttpResponseAttributes;
 import org.clicksend.internal.MMSMediaParameters;
 import org.clicksend.internal.MMSParameters;
 import org.clicksend.internal.SMSParameters;
+import org.clicksend.internal.config.ClickSendConfiguration;
 import org.clicksend.internal.connection.ClickSendConnection;
 import org.clicksend.internal.connection.provider.ClickSendConnectionProvider;
 import org.clicksend.internal.error.exception.ClickSendMmsException;
@@ -39,6 +40,7 @@ import org.mule.runtime.extension.api.annotation.param.MediaType;
 import org.mule.runtime.extension.api.annotation.param.ParameterGroup;
 import org.mule.runtime.extension.api.annotation.param.display.DisplayName;
 import org.mule.runtime.extension.api.annotation.param.display.Summary;
+import org.mule.runtime.extension.api.exception.ModuleException;
 import org.mule.runtime.extension.api.runtime.operation.Result;
 import org.mule.runtime.http.api.HttpService;
 import org.mule.runtime.http.api.client.HttpClient;
@@ -91,14 +93,14 @@ public class ClickSendMule4sOperations {
 	@Summary("Send SMS to a number")
 	@OutputJsonType(schema = "sms.json")
 	@Throws(MessageErrorTypeProvider.class)
-	public Result<String, HttpResponseAttributes> sendSMS(@Config ClickSendConnectionProvider configuration,
+	public Result<String, HttpResponseAttributes> sendSMS(@Config ClickSendConfiguration configuration,
 			@Connection ClickSendConnection connection,
-			@ParameterGroup(name = "SMS Parameters") SMSParameters smsParams) throws IOException, ClickSendSmsException, TimeoutException {
+			@ParameterGroup(name = "SMS Parameters") SMSParameters smsParams) throws IOException, TimeoutException, ModuleException {
 
 		ClickSendConnectionProvider connectionProvider = new ClickSendConnectionProvider();
 		connectionProvider.start();
-		String username = configuration.getUserId();
-		String password = configuration.getPassword();
+		String username = "";//configuration.getUserId();
+		String password = "";//configuration.getPassword();
 
 		String auth = BASIC + Base64.getEncoder().encodeToString((username + ":" + password).getBytes());
 		JSONObject root = null;
@@ -167,7 +169,7 @@ public class ClickSendMule4sOperations {
 	public Result<String, HttpResponseAttributes> sendMMS(@Config ClickSendConnectionProvider configuration,
 			@Connection ClickSendConnection connection,
 			@ParameterGroup(name = "MMS Parameters") MMSParameters mmsParams,
-			@ParameterGroup(name = "MMS Media Parameters") MMSMediaParameters mmsMediaParams) throws IllegalArgumentException, UnsupportedEncodingException, JSONException, IOException, ClickSendMmsException, TimeoutException {
+			@ParameterGroup(name = "MMS Media Parameters") MMSMediaParameters mmsMediaParams) throws IllegalArgumentException, UnsupportedEncodingException, JSONException, IOException, TimeoutException, ModuleException {
 		String username = configuration.getUserId();
 		String password = configuration.getPassword();
 
